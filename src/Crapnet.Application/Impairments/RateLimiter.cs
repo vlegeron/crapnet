@@ -49,8 +49,11 @@ public sealed class RateLimiter
         var releaseAt = Math.Max(nowMilliseconds, _nextFreeMilliseconds);
         if (releaseAt - nowMilliseconds > MaxQueueMilliseconds) return null;
 
+        // Advance from where the link actually was, not from the release time. When the link is
+        // busy the two are the same, but when it is running behind the clock that difference is
+        // the idle credit, and rebasing onto the release time would silently discard it.
         var transmitMilliseconds = (long)Math.Ceiling(packetBytes * 8 * 1000.0 / BitsPerSecond);
-        _nextFreeMilliseconds = releaseAt + transmitMilliseconds;
+        _nextFreeMilliseconds += transmitMilliseconds;
         return releaseAt;
     }
 }
