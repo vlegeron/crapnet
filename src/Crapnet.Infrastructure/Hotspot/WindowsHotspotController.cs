@@ -96,7 +96,7 @@ public sealed class WindowsHotspotController : IHotspotController
             {
                 SetState(HotspotState.Unavailable);
                 _logger.LogInformation("No connection profile is available to share.");
-                return HotspotAvailability.Unknown;
+                return HotspotAvailability.NoUplink;
             }
 
             TetheringCapability capability;

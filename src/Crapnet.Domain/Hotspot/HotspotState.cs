@@ -20,7 +20,14 @@ public enum HotspotAvailability
     WifiOff = 2,
     NotSupportedByDriver = 3,
     BlockedByPolicy = 4,
-    Unknown = 5,
+
+    /// <summary>
+    /// There is no connection to share. Distinct from <see cref="Unknown"/> on purpose: this one
+    /// means "plug the cable in", which is a thing the user can act on.
+    /// </summary>
+    NoUplink = 5,
+
+    Unknown = 6,
 }
 
 public static class HotspotStateExtensions
