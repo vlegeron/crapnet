@@ -27,12 +27,6 @@ public interface IPacketGateway : IDisposable
     /// <summary>Returns a packet to the pool. Every received packet must be released exactly once.</summary>
     void Release(CapturedPacket packet);
 
-    /// <summary>
-    /// Borrows a spare packet buffer, for impairments that emit traffic of their own such as a
-    /// crafted TCP reset. Release it the same way as a captured one.
-    /// </summary>
-    CapturedPacket RentOutgoing();
-
     /// <summary>Recomputes IP and transport checksums in place after the payload has been altered.</summary>
     void RecalculateChecksums(CapturedPacket packet);
 

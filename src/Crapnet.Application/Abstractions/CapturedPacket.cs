@@ -33,9 +33,6 @@ public sealed class CapturedPacket
     /// <summary>Opaque per-packet state belonging to the gateway. Never interpreted above infrastructure.</summary>
     public object? GatewayToken { get; set; }
 
-    /// <summary>When the packet was captured, in gateway clock milliseconds.</summary>
-    public long CapturedAtMilliseconds { get; set; }
-
     public Span<byte> Span => Buffer.AsSpan(0, Length);
     public ReadOnlySpan<byte> ReadOnlySpan => Buffer.AsSpan(0, Length);
     public Span<byte> PayloadSpan => Buffer.AsSpan(PayloadOffset, PayloadLength);
@@ -46,6 +43,5 @@ public sealed class CapturedPacket
         PayloadOffset = 0;
         PayloadLength = 0;
         Descriptor = default;
-        CapturedAtMilliseconds = 0;
     }
 }
