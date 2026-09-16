@@ -1,0 +1,235 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="using:Crapnet.App.Controls"
+             xmlns:vm="using:Crapnet.App.ViewModels"
+             x:Class="Crapnet.App.Views.RuleEditorView"
+             x:DataType="vm:RuleViewModel"
+             x:CompileBindings="True">
+
+  <UserControl.DataTemplates>
+
+    <DataTemplate DataType="vm:BlockCardViewModel" x:DataType="vm:BlockCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <TextBlock Classes="muted" FontSize="10.5" Text="nothing gets through" />
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:DropCardViewModel" x:DataType="vm:DropCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <Slider Grid.Column="0" Margin="0,0,8,0" Minimum="0" Maximum="100" Value="{Binding Chance.Value, Mode=TwoWay}" />
+          <TextBox Grid.Column="1" Classes="numeric" Classes.invalid="{Binding Chance.HasError}"
+                   Text="{Binding Chance.Text, Mode=TwoWay}" />
+          <TextBlock Grid.Column="2" Classes="unit" Text="%" Margin="4,0,0,0" />
+        </Grid>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:ResetCardViewModel" x:DataType="vm:ResetCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <Slider Grid.Column="0" Margin="0,0,8,0" Minimum="0" Maximum="100" Value="{Binding Chance.Value, Mode=TwoWay}" />
+          <TextBox Grid.Column="1" Classes="numeric" Classes.invalid="{Binding Chance.HasError}"
+                   Text="{Binding Chance.Text, Mode=TwoWay}" />
+          <TextBlock Grid.Column="2" Classes="unit" Text="%" Margin="4,0,0,0" />
+        </Grid>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:TamperCardViewModel" x:DataType="vm:TamperCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <StackPanel Spacing="7">
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <Slider Grid.Column="0" Margin="0,0,8,0" Minimum="0" Maximum="100" Value="{Binding Chance.Value, Mode=TwoWay}" />
+            <TextBox Grid.Column="1" Classes="numeric" Classes.invalid="{Binding Chance.HasError}"
+                     Text="{Binding Chance.Text, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" Classes="unit" Text="%" Margin="4,0,0,0" />
+          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock Classes="unit" Text="&#x2264;" />
+            <TextBox Classes="numeric" Classes.invalid="{Binding MaxBytes.HasError}"
+                     Text="{Binding MaxBytes.Text, Mode=TwoWay}" />
+            <TextBlock Classes="unit" Text="B" />
+            <!-- Off leaves the checksum wrong, which is what a genuinely noisy radio looks like. -->
+            <ToggleButton Theme="{DynamicResource ChipToggle}" Content="sum" Margin="4,0,0,0"
+                          IsChecked="{Binding FixChecksum, Mode=TwoWay}" />
+          </StackPanel>
+        </StackPanel>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:DuplicateCardViewModel" x:DataType="vm:DuplicateCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <StackPanel Spacing="7">
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <Slider Grid.Column="0" Margin="0,0,8,0" Minimum="0" Maximum="100" Value="{Binding Chance.Value, Mode=TwoWay}" />
+            <TextBox Grid.Column="1" Classes="numeric" Classes.invalid="{Binding Chance.HasError}"
+                     Text="{Binding Chance.Text, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" Classes="unit" Text="%" Margin="4,0,0,0" />
+          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock Classes="unit" Text="&#x00D7;" />
+            <TextBox Classes="numeric" Classes.invalid="{Binding Copies.HasError}"
+                     Text="{Binding Copies.Text, Mode=TwoWay}" />
+          </StackPanel>
+        </StackPanel>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:BandwidthCardViewModel" x:DataType="vm:BandwidthCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+          <TextBox Classes="numeric" Width="78" Classes.invalid="{Binding Rate.HasError}"
+                   Text="{Binding Rate.Text, Mode=TwoWay}" />
+          <TextBlock Classes="unit" Text="kbps" />
+        </StackPanel>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:ThrottleCardViewModel" x:DataType="vm:ThrottleCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <StackPanel Spacing="7">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBox Classes="numeric" Classes.invalid="{Binding Timeframe.HasError}"
+                     Text="{Binding Timeframe.Text, Mode=TwoWay}" />
+            <TextBlock Classes="unit" Text="ms" />
+            <!-- Discard the held burst instead of releasing it: a buffer that overran. -->
+            <ToggleButton Theme="{DynamicResource ChipToggle}" Content="drop" Margin="4,0,0,0"
+                          IsChecked="{Binding DropThrottled, Mode=TwoWay}" />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <Slider Grid.Column="0" Margin="0,0,8,0" Minimum="0" Maximum="100" Value="{Binding Chance.Value, Mode=TwoWay}" />
+            <TextBox Grid.Column="1" Classes="numeric" Classes.invalid="{Binding Chance.HasError}"
+                     Text="{Binding Chance.Text, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" Classes="unit" Text="%" Margin="4,0,0,0" />
+          </Grid>
+        </StackPanel>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:ReorderCardViewModel" x:DataType="vm:ReorderCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <StackPanel Spacing="7">
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <Slider Grid.Column="0" Margin="0,0,8,0" Minimum="0" Maximum="100" Value="{Binding Chance.Value, Mode=TwoWay}" />
+            <TextBox Grid.Column="1" Classes="numeric" Classes.invalid="{Binding Chance.HasError}"
+                     Text="{Binding Chance.Text, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" Classes="unit" Text="%" Margin="4,0,0,0" />
+          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock Classes="unit" Text="&#x2264;" />
+            <TextBox Classes="numeric" Classes.invalid="{Binding MaxDelay.HasError}"
+                     Text="{Binding MaxDelay.Text, Mode=TwoWay}" />
+            <TextBlock Classes="unit" Text="ms" />
+          </StackPanel>
+        </StackPanel>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:LagCardViewModel" x:DataType="vm:LagCardViewModel">
+      <ctl:ImpairmentCard Title="{Binding Title}" Glyph="{Binding Glyph}" Summary="{Binding Summary}"
+                          IsActive="{Binding IsEnabled, Mode=TwoWay}">
+        <StackPanel Spacing="7">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBox Classes="numeric" Classes.invalid="{Binding Delay.HasError}"
+                     Text="{Binding Delay.Text, Mode=TwoWay}" />
+            <TextBlock Classes="unit" Text="ms" />
+            <TextBlock Classes="unit" Text="&#x00B1;" Margin="4,0,0,0" />
+            <TextBox Classes="numeric" Classes.invalid="{Binding Jitter.HasError}"
+                     Text="{Binding Jitter.Text, Mode=TwoWay}" />
+            <TextBlock Classes="unit" Text="ms" />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <Slider Grid.Column="0" Margin="0,0,8,0" Minimum="0" Maximum="100" Value="{Binding Chance.Value, Mode=TwoWay}" />
+            <TextBox Grid.Column="1" Classes="numeric" Classes.invalid="{Binding Chance.HasError}"
+                     Text="{Binding Chance.Text, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" Classes="unit" Text="%" Margin="4,0,0,0" />
+          </Grid>
+        </StackPanel>
+      </ctl:ImpairmentCard>
+    </DataTemplate>
+
+  </UserControl.DataTemplates>
+
+  <DockPanel LastChildFill="True" Margin="6,10,12,10">
+
+    <StackPanel DockPanel.Dock="Top" Spacing="9">
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Grid.Column="0" FontSize="14" Padding="9,5" Watermark="rule" Text="{Binding Name, Mode=TwoWay}" />
+        <ToggleButton Grid.Column="1"
+                      Theme="{DynamicResource SwitchToggle}"
+                      Margin="10,0,2,0"
+                      VerticalAlignment="Center"
+                      ToolTip.Tip="Rule on"
+                      IsChecked="{Binding Enabled, Mode=TwoWay}" />
+      </Grid>
+
+      <!-- MATCH: direction and protocol first, then who and which ports. -->
+      <Border Classes="panel" Padding="11,10">
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Classes="section" Text="MATCH" VerticalAlignment="Center" Margin="0,0,4,0" />
+            <ctl:SegmentedControl ItemsSource="{Binding Match.DirectionOptions}"
+                                  SelectedItem="{Binding Match.Direction, Mode=TwoWay}">
+              <ctl:SegmentedControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:DirectionOption">
+                  <TextBlock Text="{Binding Glyph}" FontSize="13" />
+                </DataTemplate>
+              </ctl:SegmentedControl.ItemTemplate>
+            </ctl:SegmentedControl>
+            <ctl:SegmentedControl ItemsSource="{Binding Match.ProtocolOptions}"
+                                  SelectedItem="{Binding Match.Protocol, Mode=TwoWay}">
+              <ctl:SegmentedControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ProtocolOption">
+                  <TextBlock Text="{Binding Label}" />
+                </DataTemplate>
+              </ctl:SegmentedControl.ItemTemplate>
+            </ctl:SegmentedControl>
+          </StackPanel>
+
+          <Grid ColumnDefinitions="*,*,*,*">
+            <TextBox Grid.Column="0" Margin="0,0,7,0" Watermark="device ip"
+                     Classes.invalid="{Binding Match.DeviceAddresses.HasError}"
+                     ToolTip.Tip="{Binding Match.DeviceAddresses.Error}"
+                     Text="{Binding Match.DeviceAddresses.Text, Mode=TwoWay}" />
+            <TextBox Grid.Column="1" Margin="0,0,7,0" Watermark="remote ip"
+                     Classes.invalid="{Binding Match.RemoteAddresses.HasError}"
+                     ToolTip.Tip="{Binding Match.RemoteAddresses.Error}"
+                     Text="{Binding Match.RemoteAddresses.Text, Mode=TwoWay}" />
+            <TextBox Grid.Column="2" Margin="0,0,7,0" Watermark="dev port"
+                     Classes.invalid="{Binding Match.DevicePorts.HasError}"
+                     ToolTip.Tip="{Binding Match.DevicePorts.Error}"
+                     Text="{Binding Match.DevicePorts.Text, Mode=TwoWay}" />
+            <TextBox Grid.Column="3" Watermark="port"
+                     Classes.invalid="{Binding Match.RemotePorts.HasError}"
+                     ToolTip.Tip="{Binding Match.RemotePorts.Error}"
+                     Text="{Binding Match.RemotePorts.Text, Mode=TwoWay}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="section" Text="IMPAIRMENTS" Margin="2,2,0,0" />
+
+    </StackPanel>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,9,0,0">
+      <ItemsControl ItemsSource="{Binding Impairments}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel Orientation="Horizontal" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
+    </ScrollViewer>
+
+  </DockPanel>
+</UserControl>

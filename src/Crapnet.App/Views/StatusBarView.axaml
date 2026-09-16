@@ -1,0 +1,146 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="using:Crapnet.App.Controls"
+             xmlns:dd="using:Crapnet.App.DesignData"
+             xmlns:vm="using:Crapnet.App.ViewModels"
+             x:Class="Crapnet.App.Views.StatusBarView"
+             x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="True"
+             Design.DataContext="{x:Static dd:DesignTimeData.MainWindow}">
+
+  <UserControl.Styles>
+    <Style Selector="Border.chip">
+      <Setter Property="Background" Value="{DynamicResource CnRaised}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="9,3" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.chip.on">
+      <Setter Property="Background" Value="{DynamicResource CnAccentWash}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnAccent}" />
+    </Style>
+    <Style Selector="Border.chip.fault">
+      <Setter Property="Background" Value="{DynamicResource CnDangerWash}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnDanger}" />
+    </Style>
+    <Style Selector="Border.chip.on TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource CnAccent}" />
+    </Style>
+    <Style Selector="Border.chip.fault TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource CnDanger}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="Auto,*,Auto" Margin="14,8">
+
+    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+
+      <Border Classes="chip" Classes.on="{Binding IsLive}" Classes.fault="{Binding IsFaulted}">
+        <TextBlock Classes="label" Text="{Binding EngineText}" />
+      </Border>
+
+      <!-- Bypass keeps the capture attached but stops touching anything, for an A/B against clean. -->
+      <ToggleButton Theme="{DynamicResource ChipToggle}"
+                    Classes="warn"
+                    Content="BYPASS"
+                    IsChecked="{Binding Bypass, Mode=TwoWay}" />
+
+      <Border Width="1" Background="{DynamicResource CnBorder}" Margin="3,2" />
+
+      <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+        <TextBlock Text="&#x2191;" Foreground="{DynamicResource CnAccent}" VerticalAlignment="Center" />
+        <TextBlock Classes="value" Text="{Binding Stats.UplinkText}" MinWidth="62" />
+        <TextBlock Text="&#x2193;" Foreground="{DynamicResource CnInfo}" VerticalAlignment="Center" Margin="6,0,0,0" />
+        <TextBlock Classes="value" Text="{Binding Stats.DownlinkText}" MinWidth="62" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+        <TextBlock Classes="label" Text="DROP" />
+        <TextBlock Classes="value" Text="{Binding Stats.DropText}" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+        <TextBlock Classes="label" Text="Q" />
+        <TextBlock Classes="value" Text="{Binding Stats.QueueText}" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+        <TextBlock Classes="label" Text="UP" />
+        <TextBlock Classes="value" Text="{Binding Stats.UptimeText}" />
+      </StackPanel>
+
+    </StackPanel>
+
+    <!-- Last notable event. Click to clear. -->
+    <Button Grid.Column="1"
+            HorizontalAlignment="Left"
+            HorizontalContentAlignment="Left"
+            Margin="14,0"
+            Padding="8,2"
+            Background="Transparent"
+            BorderThickness="0"
+            FontSize="11"
+            Foreground="{DynamicResource CnWarn}"
+            IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+            Command="{Binding ClearMessageCommand}"
+            Content="{Binding Message}" />
+
+    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+
+      <!-- Associated devices. Picking one narrows the selected rule to its address. -->
+      <Button Padding="9,3" Background="Transparent" ToolTip.Tip="Clients">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Classes="label" Text="DEV" />
+          <TextBlock Classes="value" Text="{Binding ClientCount}" />
+        </StackPanel>
+        <Button.Flyout>
+          <Flyout Placement="Top">
+            <StackPanel Width="230" Spacing="6">
+              <TextBlock Classes="section" Text="CLIENTS" />
+              <TextBlock Classes="muted" FontSize="11" Text="none" IsVisible="{Binding !HasClients}" />
+              <ListBox ItemsSource="{Binding Clients}" ItemContainerTheme="{DynamicResource PlainListItem}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ClientViewModel">
+                    <Grid ColumnDefinitions="*,Auto" Background="Transparent">
+                      <StackPanel Grid.Column="0">
+                        <TextBlock Classes="value" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Classes="muted" FontSize="10.5" Text="{Binding AddressText}" />
+                      </StackPanel>
+                      <Button Grid.Column="1"
+                              Theme="{DynamicResource GlyphButton}"
+                              Content="&#x2192;"
+                              ToolTip.Tip="Filter to this device"
+                              Command="{Binding UseCommand}" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </StackPanel>
+          </Flyout>
+        </Button.Flyout>
+      </Button>
+
+      <Border Background="{DynamicResource CnSurface}"
+              BorderBrush="{DynamicResource CnBorder}"
+              BorderThickness="1"
+              CornerRadius="6"
+              Padding="4,3"
+              Width="196"
+              Height="30">
+        <Panel>
+          <ctl:Sparkline Samples="{Binding Stats.DownlinkSamples}"
+                         Maximum="{Binding Stats.Scale}"
+                         Stroke="{DynamicResource CnInfo}"
+                         Fill="{DynamicResource CnInfoWash}" />
+          <ctl:Sparkline Samples="{Binding Stats.UplinkSamples}"
+                         Maximum="{Binding Stats.Scale}"
+                         Stroke="{DynamicResource CnAccent}" />
+        </Panel>
+      </Border>
+
+    </StackPanel>
+
+  </Grid>
+</UserControl>

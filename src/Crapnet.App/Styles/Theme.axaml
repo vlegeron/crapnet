@@ -1,0 +1,113 @@
+<!--
+  The whole palette in one place. Views reference these keys and never literal colours, so a
+  retune means editing this file rather than hunting through the XAML.
+
+  The second half re-points the Fluent theme's own resource keys at the same palette. Fluent
+  resolves those with DynamicResource, so overriding them here restyles the stock TextBox,
+  ComboBox, Slider and ScrollBar without us having to own their templates.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Color x:Key="CnBaseColor">#FF0E1116</Color>
+  <Color x:Key="CnSurfaceColor">#FF151A21</Color>
+  <Color x:Key="CnRaisedColor">#FF1B222B</Color>
+  <Color x:Key="CnBorderColor">#FF262E3A</Color>
+  <Color x:Key="CnTextColor">#FFE6EDF3</Color>
+  <Color x:Key="CnMutedColor">#FF8A94A6</Color>
+  <Color x:Key="CnAccentColor">#FF7AF0A0</Color>
+  <Color x:Key="CnWarnColor">#FFFFB86A</Color>
+  <Color x:Key="CnDangerColor">#FFFF6A5C</Color>
+  <Color x:Key="CnInfoColor">#FF6AB8FF</Color>
+
+  <SolidColorBrush x:Key="CnBase" Color="{StaticResource CnBaseColor}" />
+  <SolidColorBrush x:Key="CnSurface" Color="{StaticResource CnSurfaceColor}" />
+  <SolidColorBrush x:Key="CnRaised" Color="{StaticResource CnRaisedColor}" />
+  <SolidColorBrush x:Key="CnBorder" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="CnText" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="CnMuted" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="CnAccent" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="CnWarn" Color="{StaticResource CnWarnColor}" />
+  <SolidColorBrush x:Key="CnDanger" Color="{StaticResource CnDangerColor}" />
+  <SolidColorBrush x:Key="CnInfo" Color="{StaticResource CnInfoColor}" />
+
+  <!-- Washes, used for chip fills and the area under the sparkline. -->
+  <SolidColorBrush x:Key="CnAccentWash" Color="{StaticResource CnAccentColor}" Opacity="0.14" />
+  <SolidColorBrush x:Key="CnWarnWash" Color="{StaticResource CnWarnColor}" Opacity="0.14" />
+  <SolidColorBrush x:Key="CnDangerWash" Color="{StaticResource CnDangerColor}" Opacity="0.14" />
+  <SolidColorBrush x:Key="CnInfoWash" Color="{StaticResource CnInfoColor}" Opacity="0.14" />
+
+  <x:Double x:Key="CnGlyphSize">13</x:Double>
+  <x:Double x:Key="CnLabelSize">10.5</x:Double>
+  <x:Double x:Key="CnBodySize">12</x:Double>
+  <Thickness x:Key="CnFieldPadding">8,4</Thickness>
+
+  <!-- Fluent overrides: shared shape. -->
+  <CornerRadius x:Key="ControlCornerRadius">6</CornerRadius>
+  <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
+
+  <!-- Fluent overrides: TextBox. -->
+  <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource CnBaseColor}" />
+  <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource CnBaseColor}" />
+  <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource CnBaseColor}" />
+  <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource CnSurfaceColor}" />
+  <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="{StaticResource CnAccentColor}" Opacity="0.35" />
+  <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+  <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+  <x:Double x:Key="TextControlThemeMinHeight">26</x:Double>
+  <x:Double x:Key="TextControlThemeMinWidth">0</x:Double>
+
+  <!-- Fluent overrides: ComboBox. -->
+  <SolidColorBrush x:Key="ComboBoxBackground" Color="{StaticResource CnBaseColor}" />
+  <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{StaticResource CnRaisedColor}" />
+  <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{StaticResource CnRaisedColor}" />
+  <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="{StaticResource CnSurfaceColor}" />
+  <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="ComboBoxForeground" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="{StaticResource CnRaisedColor}" />
+  <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="ComboBoxDropDownForeground" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="{StaticResource CnMutedColor}" />
+  <x:Double x:Key="ComboBoxMinHeight">26</x:Double>
+
+  <!-- Fluent overrides: Slider. -->
+  <SolidColorBrush x:Key="SliderContainerBackground" Color="Transparent" />
+  <SolidColorBrush x:Key="SliderTrackFill" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="SliderTrackFillPressed" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="SliderTrackFillDisabled" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="SliderTrackValueFill" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="SliderTrackValueFillDisabled" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="SliderThumbBackground" Color="{StaticResource CnTextColor}" />
+  <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="{StaticResource CnAccentColor}" />
+  <SolidColorBrush x:Key="SliderThumbBackgroundDisabled" Color="{StaticResource CnMutedColor}" />
+
+  <!-- Fluent overrides: scrolling and flyouts. -->
+  <SolidColorBrush x:Key="ScrollBarBackground" Color="Transparent" />
+  <SolidColorBrush x:Key="ScrollBarPanningBackground" Color="Transparent" />
+  <SolidColorBrush x:Key="ScrollBarThumbBackgroundColor" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="ScrollBarThumbFill" Color="{StaticResource CnBorderColor}" />
+  <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="{StaticResource CnMutedColor}" />
+  <SolidColorBrush x:Key="FlyoutPresenterBackground" Color="{StaticResource CnRaisedColor}" />
+  <SolidColorBrush x:Key="FlyoutBorderThemeBrush" Color="{StaticResource CnBorderColor}" />
+
+</ResourceDictionary>

@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dd="using:Crapnet.App.DesignData"
+        xmlns:views="using:Crapnet.App.Views"
+        xmlns:vm="using:Crapnet.App.ViewModels"
+        x:Class="Crapnet.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
+        Design.DataContext="{x:Static dd:DesignTimeData.MainWindow}"
+        Title="Crapnet"
+        Width="1180" Height="760"
+        MinWidth="1000" MinHeight="640"
+        FontSize="12"
+        Background="{DynamicResource CnBase}"
+        Foreground="{DynamicResource CnText}">
+
+  <DockPanel LastChildFill="True">
+
+    <Border DockPanel.Dock="Top" Background="{DynamicResource CnSurface}" BorderBrush="{DynamicResource CnBorder}" BorderThickness="0,0,0,1">
+      <views:HeaderView />
+    </Border>
+
+    <!-- Preflight: elevation and driver problems, listed once and dismissible. -->
+    <Border DockPanel.Dock="Top"
+            Background="{DynamicResource CnWarnWash}"
+            BorderBrush="{DynamicResource CnWarn}"
+            BorderThickness="0,0,0,1"
+            Padding="14,7"
+            IsVisible="{Binding HasPreflightIssues}">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <TextBlock Grid.Column="0"
+                   Text="&#x26A0;"
+                   FontSize="13"
+                   Margin="0,0,10,0"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource CnWarn}" />
+        <ItemsControl Grid.Column="1" ItemsSource="{Binding PreflightIssues}" VerticalAlignment="Center">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <TextBlock Text="{Binding}" FontSize="11" Foreground="{DynamicResource CnWarn}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Button Grid.Column="2"
+                Theme="{DynamicResource GlyphButton}"
+                Content="&#x2715;"
+                ToolTip.Tip="Dismiss"
+                Command="{Binding DismissPreflightCommand}" />
+      </Grid>
+    </Border>
+
+    <Border DockPanel.Dock="Bottom" Background="{DynamicResource CnSurface}" BorderBrush="{DynamicResource CnBorder}" BorderThickness="0,1,0,0">
+      <views:StatusBarView />
+    </Border>
+
+    <Grid ColumnDefinitions="280,1,*">
+
+      <views:RuleListView Grid.Column="0" />
+
+      <Border Grid.Column="1" Background="{DynamicResource CnBorder}" />
+
+      <Panel Grid.Column="2">
+        <Border IsVisible="{Binding HasSelection}">
+          <views:RuleEditorView DataContext="{Binding SelectedRule}" />
+        </Border>
+        <TextBlock Classes="muted"
+                   Text="no rule selected"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   IsVisible="{Binding !HasSelection}" />
+      </Panel>
+
+    </Grid>
+
+  </DockPanel>
+</Window>

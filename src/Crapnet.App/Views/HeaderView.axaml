@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="using:Crapnet.App.Controls"
+             xmlns:dd="using:Crapnet.App.DesignData"
+             xmlns:hs="using:Crapnet.Domain.Hotspot"
+             xmlns:vm="using:Crapnet.App.ViewModels"
+             x:Class="Crapnet.App.Views.HeaderView"
+             x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="True"
+             Design.DataContext="{x:Static dd:DesignTimeData.MainWindow}">
+
+  <UserControl.Styles>
+    <Style Selector="Ellipse.dot">
+      <Setter Property="Width" Value="8" />
+      <Setter Property="Height" Value="8" />
+      <Setter Property="Fill" Value="{DynamicResource CnMuted}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Ellipse.dot.on">
+      <Setter Property="Fill" Value="{DynamicResource CnAccent}" />
+    </Style>
+    <Style Selector="Ellipse.dot.busy">
+      <Setter Property="Fill" Value="{DynamicResource CnWarn}" />
+    </Style>
+    <Style Selector="Ellipse.dot.fault">
+      <Setter Property="Fill" Value="{DynamicResource CnDanger}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="Auto,*,Auto" Margin="14,10">
+
+    <!-- Identity and the settings a session is started with. -->
+    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+
+      <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+        <Ellipse Width="7" Height="7" Fill="{DynamicResource CnAccent}" VerticalAlignment="Center" />
+        <TextBlock Text="CRAPNET" FontSize="13" FontWeight="Bold" LetterSpacing="2.4" VerticalAlignment="Center" />
+      </StackPanel>
+
+      <Border Width="1" Background="{DynamicResource CnBorder}" Margin="2,3" />
+
+      <TextBox Width="132" Watermark="ssid" Text="{Binding Hotspot.Ssid, Mode=TwoWay}" />
+
+      <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+        <TextBox Width="126"
+                 Watermark="key"
+                 PasswordChar="&#x25CF;"
+                 IsVisible="{Binding !Hotspot.RevealPassphrase}"
+                 Text="{Binding Hotspot.Passphrase, Mode=TwoWay}" />
+        <TextBox Width="126"
+                 Watermark="key"
+                 IsVisible="{Binding Hotspot.RevealPassphrase}"
+                 Text="{Binding Hotspot.Passphrase, Mode=TwoWay}" />
+        <ToggleButton Theme="{DynamicResource ChipToggle}"
+                      Content="&#x25C9;"
+                      Padding="6,2"
+                      ToolTip.Tip="Show key"
+                      IsChecked="{Binding Hotspot.RevealPassphrase, Mode=TwoWay}" />
+      </StackPanel>
+
+      <ComboBox Width="92" SelectedItem="{Binding Hotspot.Band, Mode=TwoWay}" ItemsSource="{Binding Hotspot.BandOptions}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:BandOption">
+            <TextBlock Text="{Binding Label}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <ComboBox Width="168"
+                ToolTip.Tip="Uplink"
+                SelectedItem="{Binding Hotspot.Uplink, Mode=TwoWay}"
+                ItemsSource="{Binding Hotspot.Adapters}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="hs:NetworkAdapter">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Ellipse Classes="dot" Classes.on="{Binding HasInternet}" Width="6" Height="6" />
+              <TextBlock Text="{Binding Name}" />
+            </StackPanel>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <!-- Which slice of the stack to intercept: routed client traffic, the host, or both. -->
+      <ctl:SegmentedControl ItemsSource="{Binding Hotspot.ScopeOptions}" SelectedItem="{Binding Hotspot.Scope, Mode=TwoWay}">
+        <ctl:SegmentedControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:ScopeOption">
+            <TextBlock Text="{Binding Label}" />
+          </DataTemplate>
+        </ctl:SegmentedControl.ItemTemplate>
+      </ctl:SegmentedControl>
+
+    </StackPanel>
+
+    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+      <Ellipse Classes="dot"
+               Classes.on="{Binding IsLive}"
+               Classes.busy="{Binding IsBusy}"
+               Classes.fault="{Binding IsFaulted}" />
+      <Button Theme="{DynamicResource PowerButton}"
+              Content="&#x23FB;"
+              ToolTip.Tip="Start / stop"
+              Classes.on="{Binding IsLive}"
+              Classes.busy="{Binding IsBusy}"
+              Command="{Binding ToggleSessionCommand}" />
+    </StackPanel>
+
+  </Grid>
+</UserControl>

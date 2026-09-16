@@ -1,0 +1,424 @@
+<!--
+  Control themes we own outright plus the handful of class styles the views lean on.
+
+  Only the controls whose look defines the tool are re-templated here: buttons, the two toggle
+  shapes, the impairment card, the segmented picker and list rows. Text boxes, combo boxes and
+  sliders keep their Fluent templates and are recoloured through Theme.axaml, which keeps their
+  input behaviour intact for free.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctl="using:Crapnet.App.Controls">
+
+  <Styles.Resources>
+
+    <ControlTheme x:Key="{x:Type Button}" TargetType="Button">
+      <Setter Property="Background" Value="{DynamicResource CnRaised}" />
+      <Setter Property="Foreground" Value="{DynamicResource CnText}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="10,4" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Bg"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover /template/ Border#PART_Bg">
+        <Setter Property="BorderBrush" Value="{DynamicResource CnMuted}" />
+      </Style>
+      <Style Selector="^:pressed /template/ Border#PART_Bg">
+        <Setter Property="Background" Value="{DynamicResource CnBorder}" />
+      </Style>
+      <Style Selector="^:disabled">
+        <Setter Property="Opacity" Value="0.4" />
+      </Style>
+    </ControlTheme>
+
+    <!-- Borderless button for the icon strips under the rule list. -->
+    <ControlTheme x:Key="GlyphButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnBorder}" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Width" Value="26" />
+      <Setter Property="Height" Value="24" />
+      <Setter Property="FontSize" Value="13" />
+      <Style Selector="^:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource CnText}" />
+      </Style>
+    </ControlTheme>
+
+    <!-- The one large control in the window: start and stop the whole session. -->
+    <ControlTheme x:Key="PowerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Width" Value="46" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="FontSize" Value="17" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+      <Style Selector="^.on">
+        <Setter Property="Foreground" Value="{DynamicResource CnAccentColor}" />
+        <Style Selector="^ /template/ Border#PART_Bg">
+          <Setter Property="Background" Value="{DynamicResource CnAccentWash}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource CnAccent}" />
+          <Setter Property="BoxShadow" Value="0 0 14 0 #3D7AF0A0" />
+        </Style>
+      </Style>
+      <Style Selector="^.busy">
+        <Setter Property="Foreground" Value="{DynamicResource CnWarn}" />
+        <Style Selector="^ /template/ Border#PART_Bg">
+          <Setter Property="BorderBrush" Value="{DynamicResource CnWarn}" />
+        </Style>
+      </Style>
+    </ControlTheme>
+
+    <!-- The switch every impairment card carries. -->
+    <ControlTheme x:Key="SwitchToggle" TargetType="ToggleButton">
+      <Setter Property="Width" Value="32" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="Track"
+                  Background="{DynamicResource CnBase}"
+                  BorderBrush="{DynamicResource CnBorder}"
+                  BorderThickness="1"
+                  CornerRadius="9">
+            <Ellipse Name="Knob"
+                     Width="12" Height="12"
+                     Margin="2,0,0,0"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Center"
+                     Fill="{DynamicResource CnMuted}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:checked /template/ Border#Track">
+        <Setter Property="Background" Value="{DynamicResource CnAccentWash}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CnAccent}" />
+        <Setter Property="BoxShadow" Value="0 0 10 0 #3D7AF0A0" />
+      </Style>
+      <Style Selector="^:checked /template/ Ellipse#Knob">
+        <Setter Property="Margin" Value="0,0,2,0" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Fill" Value="{DynamicResource CnAccent}" />
+      </Style>
+      <Style Selector="^:pointerover /template/ Border#Track">
+        <Setter Property="BorderBrush" Value="{DynamicResource CnMuted}" />
+      </Style>
+      <Style Selector="^:disabled">
+        <Setter Property="Opacity" Value="0.4" />
+      </Style>
+    </ControlTheme>
+
+    <!-- Small labelled toggle: bypass, reveal password, "fix sum", "drop". -->
+    <ControlTheme x:Key="ChipToggle" TargetType="ToggleButton">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="8,3" />
+      <Setter Property="FontSize" Value="10.5" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Bg"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover /template/ Border#PART_Bg">
+        <Setter Property="BorderBrush" Value="{DynamicResource CnMuted}" />
+      </Style>
+      <Style Selector="^:checked">
+        <Setter Property="Foreground" Value="{DynamicResource CnAccent}" />
+        <Style Selector="^ /template/ Border#PART_Bg">
+          <Setter Property="Background" Value="{DynamicResource CnAccentWash}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource CnAccent}" />
+        </Style>
+      </Style>
+      <!-- Bypass is the one toggle where "on" means traffic is untouched, so it warns instead. -->
+      <Style Selector="^.warn:checked">
+        <Setter Property="Foreground" Value="{DynamicResource CnWarn}" />
+        <Style Selector="^ /template/ Border#PART_Bg">
+          <Setter Property="Background" Value="{DynamicResource CnWarnWash}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource CnWarn}" />
+        </Style>
+      </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ctl:SegmentedItem}" TargetType="ctl:SegmentedItem">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+      <Setter Property="Padding" Value="9,3" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Bg"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="4"
+                  Margin="1">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource CnText}" />
+      </Style>
+      <Style Selector="^:selected">
+        <Setter Property="Foreground" Value="{DynamicResource CnText}" />
+        <Style Selector="^ /template/ Border#PART_Bg">
+          <Setter Property="Background" Value="{DynamicResource CnBorder}" />
+        </Style>
+      </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ctl:SegmentedControl}" TargetType="ctl:SegmentedControl">
+      <Setter Property="Background" Value="{DynamicResource CnBase}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ctl:ImpairmentCard}" TargetType="ctl:ImpairmentCard">
+      <Setter Property="Background" Value="{DynamicResource CnSurface}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CnBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Margin" Value="0,0,10,10" />
+      <Setter Property="Width" Value="238" />
+      <!-- Cards carry between zero and three rows of parameters; a floor keeps the grid even. -->
+      <Setter Property="MinHeight" Value="94" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Shell"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="11,9,11,11">
+            <DockPanel LastChildFill="True">
+              <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
+                <TextBlock Grid.Column="0"
+                           Text="{TemplateBinding Glyph}"
+                           FontSize="13"
+                           Width="18"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource CnMuted}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                  <TextBlock Name="PART_Title"
+                             Text="{TemplateBinding Title}"
+                             FontSize="11"
+                             FontWeight="SemiBold"
+                             LetterSpacing="0.6"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource CnText}" />
+                  <TextBlock Text="{TemplateBinding Summary}"
+                             FontSize="10.5"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource CnMuted}" />
+                </StackPanel>
+                <ToggleButton Grid.Column="2"
+                              Theme="{StaticResource SwitchToggle}"
+                              VerticalAlignment="Center"
+                              IsChecked="{TemplateBinding IsActive, Mode=TwoWay}" />
+              </Grid>
+              <ContentPresenter Name="PART_Body"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}">
+                <ContentPresenter.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                  </Transitions>
+                </ContentPresenter.Transitions>
+              </ContentPresenter>
+            </DockPanel>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <!-- Off: the body recedes but the switch and title stay legible. -->
+      <Style Selector="^ /template/ ContentPresenter#PART_Body">
+        <Setter Property="Opacity" Value="0.32" />
+      </Style>
+      <Style Selector="^:active /template/ ContentPresenter#PART_Body">
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+      <Style Selector="^:active /template/ Border#PART_Shell">
+        <Setter Property="Background" Value="{DynamicResource CnRaised}" />
+        <Setter Property="BorderBrush" Value="#3D7AF0A0" />
+      </Style>
+      <Style Selector="^:active /template/ TextBlock#PART_Title">
+        <Setter Property="Foreground" Value="{DynamicResource CnAccent}" />
+      </Style>
+    </ControlTheme>
+
+    <!-- Rule list row: selection is marked by an accent rail rather than a filled background. -->
+    <ControlTheme x:Key="RuleListItem" TargetType="ListBoxItem">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Bg" Background="{TemplateBinding Background}" CornerRadius="6" Margin="0,1">
+            <Grid ColumnDefinitions="2,*">
+              <Border Name="PART_Rail" Grid.Column="0" Background="Transparent" CornerRadius="1" Margin="0,3" />
+              <ContentPresenter Grid.Column="1"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Padding="9,6"
+                                HorizontalContentAlignment="Stretch" />
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover /template/ Border#PART_Bg">
+        <Setter Property="Background" Value="{DynamicResource CnRaised}" />
+      </Style>
+      <Style Selector="^:selected /template/ Border#PART_Bg">
+        <Setter Property="Background" Value="{DynamicResource CnRaised}" />
+      </Style>
+      <Style Selector="^:selected /template/ Border#PART_Rail">
+        <Setter Property="Background" Value="{DynamicResource CnAccent}" />
+      </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="PlainListItem" TargetType="ListBoxItem">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Bg" Background="{TemplateBinding Background}" CornerRadius="5">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="8,5"
+                              HorizontalContentAlignment="Stretch" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover /template/ Border#PART_Bg">
+        <Setter Property="Background" Value="{DynamicResource CnBorder}" />
+      </Style>
+    </ControlTheme>
+
+  </Styles.Resources>
+
+  <!-- Typographic classes. Chrome text is uppercase and tracked out; values stay tabular. -->
+  <Style Selector="TextBlock.label">
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="LetterSpacing" Value="0.8" />
+    <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+  </Style>
+
+  <Style Selector="TextBlock.value">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="TextBlock.unit">
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="TextBlock.section">
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="1.4" />
+    <Setter Property="Foreground" Value="{DynamicResource CnMuted}" />
+  </Style>
+
+  <Style Selector="TextBox">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Padding" Value="8,3" />
+    <Setter Property="MinHeight" Value="26" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Bound to the parse result of the field, so bad input is obvious without a message. -->
+  <Style Selector="TextBox.invalid">
+    <Setter Property="BorderBrush" Value="{DynamicResource CnDanger}" />
+    <Setter Property="Foreground" Value="{DynamicResource CnDanger}" />
+  </Style>
+
+  <Style Selector="TextBox.numeric">
+    <Setter Property="Width" Value="56" />
+    <Setter Property="Padding" Value="6,3" />
+    <Setter Property="TextAlignment" Value="Right" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="MinHeight" Value="26" />
+    <Setter Property="Padding" Value="8,3" />
+  </Style>
+
+  <Style Selector="Slider">
+    <Setter Property="MinHeight" Value="20" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="ListBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+
+  <Style Selector="Border.panel">
+    <Setter Property="Background" Value="{DynamicResource CnSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource CnBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+
+</Styles>

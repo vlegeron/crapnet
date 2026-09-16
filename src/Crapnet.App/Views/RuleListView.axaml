@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dd="using:Crapnet.App.DesignData"
+             xmlns:vm="using:Crapnet.App.ViewModels"
+             x:Class="Crapnet.App.Views.RuleListView"
+             x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="True"
+             Design.DataContext="{x:Static dd:DesignTimeData.MainWindow}">
+
+  <DockPanel LastChildFill="True" Margin="12,10,6,10">
+
+    <!-- Preset scenarios, then the working name the save button writes under. -->
+    <StackPanel DockPanel.Dock="Top" Spacing="7">
+      <ComboBox HorizontalAlignment="Stretch"
+                ItemsSource="{Binding Profiles}"
+                SelectedItem="{Binding SelectedProfile, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:ProfileEntry">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="{Binding Name}" />
+              <TextBlock Grid.Column="1"
+                         Classes="label"
+                         Text="&#x2022;"
+                         Margin="8,0,0,0"
+                         IsVisible="{Binding IsBuiltIn}" />
+            </Grid>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <TextBox Grid.Column="0" Watermark="name" Text="{Binding ProfileName, Mode=TwoWay}" />
+        <Button Grid.Column="1"
+                Theme="{DynamicResource GlyphButton}"
+                Content="&#x2913;"
+                Margin="6,0,0,0"
+                ToolTip.Tip="Save"
+                Command="{Binding SaveProfileCommand}" />
+        <Button Grid.Column="2"
+                Theme="{DynamicResource GlyphButton}"
+                Content="&#x2421;"
+                Margin="4,0,0,0"
+                ToolTip.Tip="Delete"
+                Command="{Binding DeleteProfileCommand}" />
+      </Grid>
+
+      <Border Height="1" Background="{DynamicResource CnBorder}" Margin="0,3" />
+
+      <TextBlock Classes="section" Text="RULES" Margin="2,0,0,2" />
+    </StackPanel>
+
+    <!-- First match wins, so order is meaningful: the arrows below are not cosmetic. -->
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="0,8,0,0">
+      <Button Theme="{DynamicResource GlyphButton}" Content="+" ToolTip.Tip="Add" Command="{Binding AddRuleCommand}" />
+      <Button Theme="{DynamicResource GlyphButton}" Content="&#x2212;" ToolTip.Tip="Remove" Command="{Binding RemoveRuleCommand}" />
+      <Button Theme="{DynamicResource GlyphButton}" Content="&#x2191;" ToolTip.Tip="Up" Command="{Binding MoveRuleUpCommand}" />
+      <Button Theme="{DynamicResource GlyphButton}" Content="&#x2193;" ToolTip.Tip="Down" Command="{Binding MoveRuleDownCommand}" />
+    </StackPanel>
+
+    <ListBox ItemsSource="{Binding Rules}"
+             SelectedItem="{Binding SelectedRule, Mode=TwoWay}"
+             ItemContainerTheme="{DynamicResource RuleListItem}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:RuleViewModel">
+          <Grid ColumnDefinitions="Auto,*" >
+            <ToggleButton Grid.Column="0"
+                          Theme="{DynamicResource SwitchToggle}"
+                          VerticalAlignment="Center"
+                          Margin="0,0,9,0"
+                          IsChecked="{Binding Enabled, Mode=TwoWay}" />
+            <StackPanel Grid.Column="1" Spacing="1">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Classes="value" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Badges}"
+                           FontSize="11"
+                           Margin="6,0,0,0"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource CnAccent}" />
+              </Grid>
+              <TextBlock Classes="muted" FontSize="10.5" Text="{Binding Summary}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+  </DockPanel>
+</UserControl>
