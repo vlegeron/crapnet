@@ -17,10 +17,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Restore
-        run: dotnet restore tests/Crapnet.Domain.Tests tests/Crapnet.Application.Tests
-      - name: Test
-        run: dotnet test tests/Crapnet.Domain.Tests tests/Crapnet.Application.Tests --configuration Release --logger "console;verbosity=normal"
+      # One project per invocation: the .NET CLI rejects several at once with MSB1008.
+      - name: Test domain
+        run: dotnet test tests/Crapnet.Domain.Tests --configuration Release --logger "console;verbosity=normal"
+      - name: Test application
+        run: dotnet test tests/Crapnet.Application.Tests --configuration Release --logger "console;verbosity=normal"
 
   build:
     name: build (windows)
