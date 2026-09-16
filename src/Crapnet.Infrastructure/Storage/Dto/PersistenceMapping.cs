@@ -28,7 +28,6 @@ internal static class PersistenceMapping
     public static SettingsDto ToDto(AppSettings settings) => new()
     {
         Hotspot = ToDto(settings.Hotspot),
-        UplinkAdapterId = settings.UplinkAdapterId,
         LastProfileName = settings.LastProfileName,
         CaptureScope = settings.CaptureScope.ToString(),
         DisableSharingOnStop = settings.DisableSharingOnStop,
@@ -41,7 +40,6 @@ internal static class PersistenceMapping
         return new AppSettings
         {
             Hotspot = ToDomain(dto.Hotspot),
-            UplinkAdapterId = Blank(dto.UplinkAdapterId),
             LastProfileName = Blank(dto.LastProfileName),
             CaptureScope = ParseEnum(dto.CaptureScope, AppSettings.Default.CaptureScope),
             DisableSharingOnStop = dto.DisableSharingOnStop ?? AppSettings.Default.DisableSharingOnStop,

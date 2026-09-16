@@ -130,7 +130,7 @@ Windows, the capture driver or the UI: everything platform-specific sits behind 
 (`IPacketGateway`, `IHotspotController`, `IClock`, `IRandomSource`, …) and is injected.
 
 That is not decoration. It means the part most worth getting right — how nine impairments compose,
-in what order, and with what timing — is exercised by **153 tests that run anywhere**, with no
+in what order, and with what timing — is exercised by **182 tests that run anywhere**, with no
 driver, no radio and no Windows:
 
 ```bash

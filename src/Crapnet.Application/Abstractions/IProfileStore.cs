@@ -10,9 +10,6 @@ public sealed record AppSettings
 
     public HotspotConfiguration Hotspot { get; init; } = HotspotConfiguration.Default;
 
-    /// <summary>Adapter supplying the internet, normally the Ethernet NIC.</summary>
-    public string? UplinkAdapterId { get; init; }
-
     public string? LastProfileName { get; init; }
 
     public CaptureScope CaptureScope { get; init; } = CaptureScope.Forwarded;

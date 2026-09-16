@@ -61,7 +61,13 @@ public sealed class SessionOrchestrator : ISessionOrchestrator
     public bool Bypass
     {
         get => _engine.Bypass;
-        set => _engine.Bypass = value;
+        set
+        {
+            if (_engine.Bypass == value) return;
+
+            _engine.Bypass = value;
+            Publish(_status with { Bypass = value });
+        }
     }
 
     public IReadOnlyList<string> Preflight()
@@ -92,7 +98,7 @@ public sealed class SessionOrchestrator : ISessionOrchestrator
                 if (blockers.Count > 0) return StartResult.Fail(string.Join(" ", blockers));
             }
 
-            var configuration = request.Hotspot with { UplinkAdapterId = request.UplinkAdapterId };
+            var configuration = request.Hotspot;
 
             var invalid = configuration.Validate().ToList();
             if (invalid.Count > 0) return StartResult.Fail(string.Join(" ", invalid));
@@ -125,6 +131,7 @@ public sealed class SessionOrchestrator : ISessionOrchestrator
                 Hotspot = _hotspot.State,
                 Engine = _engine.State,
                 SharingEnabled = _sharing.GetState().IsEnabled,
+                Bypass = _engine.Bypass,
                 Message = null,
             });
 
@@ -154,6 +161,7 @@ public sealed class SessionOrchestrator : ISessionOrchestrator
                 Hotspot = _hotspot.State,
                 Engine = _engine.State,
                 SharingEnabled = false,
+                Bypass = _engine.Bypass,
             });
         }
         finally
@@ -191,7 +199,8 @@ public sealed class SessionOrchestrator : ISessionOrchestrator
         // driving Internet Connection Sharing on top of it would be redundant and can break it.
         if (_hotspot.SharesUplinkAutomatically) return true;
 
-        if (request.UplinkAdapterId is null)
+        var uplinkAdapterId = request.Hotspot.UplinkAdapterId;
+        if (uplinkAdapterId is null)
         {
             error = "Pick the adapter that provides the internet connection.";
             return false;
@@ -212,7 +221,7 @@ public sealed class SessionOrchestrator : ISessionOrchestrator
 
         try
         {
-            _sharing.Enable(request.UplinkAdapterId, hotspotAdapterId);
+            _sharing.Enable(uplinkAdapterId, hotspotAdapterId);
             _weEnabledSharing = true;
             return true;
         }

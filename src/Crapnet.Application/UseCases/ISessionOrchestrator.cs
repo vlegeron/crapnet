@@ -10,9 +10,6 @@ public sealed record StartRequest
 {
     public required HotspotConfiguration Hotspot { get; init; }
 
-    /// <summary>Adapter whose internet connection is shared with the hotspot. Null skips sharing.</summary>
-    public string? UplinkAdapterId { get; init; }
-
     public Profile Profile { get; init; } = Profile.Empty();
 
     public CaptureScope Scope { get; init; } = CaptureScope.Forwarded;
@@ -40,6 +37,12 @@ public sealed record SessionStatus
     public HotspotState Hotspot { get; init; } = HotspotState.Unknown;
     public EngineState Engine { get; init; } = EngineState.Stopped;
     public bool SharingEnabled { get; init; }
+
+    /// <summary>
+    /// Traffic is being passed through untouched. Reported here rather than left to whoever set
+    /// it, so a view cannot end up displaying a bypass state that stopped being true.
+    /// </summary>
+    public bool Bypass { get; init; }
 
     /// <summary>Last error or notable event, suitable for showing to the user.</summary>
     public string? Message { get; init; }

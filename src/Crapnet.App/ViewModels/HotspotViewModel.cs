@@ -119,7 +119,7 @@ public sealed class HotspotViewModel : EditableViewModel
         Scope = Scopes.FirstOrDefault(option => option.Value == settings.CaptureScope) ?? Scopes[0];
         Subnet = settings.Hotspot.Subnet;
 
-        var adapterId = settings.UplinkAdapterId ?? settings.Hotspot.UplinkAdapterId;
+        var adapterId = settings.Hotspot.UplinkAdapterId;
         if (adapterId is not null)
         {
             Uplink = Adapters.FirstOrDefault(adapter => adapter.Id == adapterId) ?? Uplink;
@@ -129,7 +129,6 @@ public sealed class HotspotViewModel : EditableViewModel
     public AppSettings ToSettings(AppSettings current) => current with
     {
         Hotspot = ToConfiguration(),
-        UplinkAdapterId = Uplink?.Id,
         CaptureScope = Scope.Value,
     };
 

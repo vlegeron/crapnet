@@ -12,7 +12,6 @@ namespace Crapnet.Infrastructure.Storage.Dto;
 internal sealed class SettingsDto
 {
     public HotspotConfigurationDto? Hotspot { get; set; }
-    public string? UplinkAdapterId { get; set; }
     public string? LastProfileName { get; set; }
 
     /// <summary>Enums travel as text so that renumbering them cannot rewrite the user's choice.</summary>

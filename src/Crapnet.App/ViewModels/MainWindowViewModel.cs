@@ -136,8 +136,10 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         get => _bypass;
         set
         {
-            if (!SetProperty(ref _bypass, value)) return;
+            if (_bypass == value) return;
 
+            // The orchestrator is the source of truth; its status event is what settles the
+            // property, so the two can never disagree.
             _orchestrator.Bypass = value;
             ApplyStatus(_orchestrator.Status);
         }
@@ -221,7 +223,6 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         var request = new StartRequest
         {
             Hotspot = Hotspot.ToConfiguration(),
-            UplinkAdapterId = Hotspot.Uplink?.Id,
             Profile = BuildProfile(),
             Scope = Hotspot.Scope.Value,
         };
@@ -452,6 +453,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
     private void ApplyStatus(SessionStatus status)
     {
+        SetProperty(ref _bypass, status.Bypass, nameof(Bypass));
+
         IsLive = status.IsLive;
         IsBusy = status.IsBusy;
         IsFaulted = status.Engine == EngineState.Faulted || status.Hotspot == HotspotState.Failed;
@@ -460,7 +463,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             { IsBusy: true } => "BUSY",
             { Engine: EngineState.Faulted } => "FAULT",
-            { Engine: EngineState.Running } => Bypass ? "BYPASS" : "ARMED",
+            { Engine: EngineState.Running } => status.Bypass ? "BYPASS" : "ARMED",
             _ => "IDLE",
         };
 
