@@ -10,6 +10,12 @@ public interface IHotspotController
     /// <summary>Adapter id of the access point interface, once it exists. Needed to wire up sharing.</summary>
     string? HotspotAdapterId { get; }
 
+    /// <summary>
+    /// True when starting the access point also shares the uplink's internet connection, which is
+    /// what Windows Mobile Hotspot does. False means the caller must set up sharing separately.
+    /// </summary>
+    bool SharesUplinkAutomatically { get; }
+
     event EventHandler<HotspotState>? StateChanged;
 
     Task<HotspotAvailability> GetAvailabilityAsync(CancellationToken cancellationToken = default);

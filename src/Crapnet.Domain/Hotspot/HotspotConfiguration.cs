@@ -27,6 +27,13 @@ public sealed record HotspotConfiguration
     public HotspotBand Band { get; init; } = HotspotBand.Auto;
 
     /// <summary>
+    /// The adapter whose internet connection the access point shares, normally the Ethernet NIC.
+    /// Windows Mobile Hotspot is built around sharing one specific connection, so this belongs to
+    /// the hotspot's configuration rather than being a separate step.
+    /// </summary>
+    public string? UplinkAdapterId { get; init; }
+
+    /// <summary>
     /// The subnet Windows hands out to tethered clients. Crapnet uses it to tell uplink from
     /// downlink, and to scope the packet capture filter.
     /// </summary>
