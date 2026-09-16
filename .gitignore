@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+artifacts/
+*.user
+*.suo
+.vs/
+.idea/
+
+# Native WinDivert runtime (fetched by scripts/fetch-windivert.ps1, not vendored)
+runtime/windivert/
+*.sys
+*.dll
+!**/refs/*.dll
+
+# Local settings
+*.local.json

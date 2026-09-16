@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Innermost layer: entities, value objects and pure policy. References nothing. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Crapnet.Domain</RootNamespace>
+  </PropertyGroup>
+</Project>
