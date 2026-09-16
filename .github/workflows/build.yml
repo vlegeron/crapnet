@@ -1,0 +1,45 @@
+name: build
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    # The domain and application layers are platform-neutral by design, so the logic that matters
+    # is tested on the cheaper runner.
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore tests/Crapnet.Domain.Tests tests/Crapnet.Application.Tests
+      - name: Test
+        run: dotnet test tests/Crapnet.Domain.Tests tests/Crapnet.Application.Tests --configuration Release --logger "console;verbosity=normal"
+
+  build:
+    name: build (windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      - name: Publish
+        run: dotnet publish src/Crapnet.App --configuration Release --runtime win-x64 --self-contained false --output publish
+      - name: Fetch WinDivert
+        shell: pwsh
+        run: ./scripts/fetch-windivert.ps1 -Destination publish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crapnet-win-x64
+          path: publish
