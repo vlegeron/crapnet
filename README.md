@@ -9,12 +9,43 @@ corrupt, rate-limit, stall, reset or blackhole it.
 
 It takes the packet-mangling idea from [clumsy](https://github.com/jagt/clumsy) and the
 hotspot-for-a-device idea from [inssidious](https://github.com/shanselman/Inssidious), and adds the
-part both leave out: **rules**. Impairments are not global. Each one is scoped to whatever slice of
+part both leave out: **rules**. Impairments are not global. Each one is scoped to the slice of
 traffic you point it at, and each toggles independently while traffic is flowing.
+
+> **Early software.** The rule engine is covered by an extensive test suite, but the Windows side
+> (capture driver, Mobile Hotspot, ICS) has had little real-hardware mileage. Bug reports welcome.
 
 ---
 
-## What you can target
+## Download
+
+Grab the latest `crapnet-<version>-win-x64.zip` from
+[**Releases**](https://github.com/vlegeron/crapnet/releases), extract it anywhere and run
+`Crapnet.exe` **as administrator**. Everything it needs, including the WinDivert capture driver,
+is in the zip. A `.sha256` file is published next to each archive if you want to verify it.
+
+### Requirements
+
+- Windows 10 2004 or later (Windows 11 fine), 64-bit
+- A Wi-Fi adapter that supports Mobile Hotspot, **and** a wired connection for the internet
+- [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+- Administrator rights, needed both to load the capture driver and to share a connection
+
+## Quick start
+
+1. Plug in Ethernet and pick it as the **uplink**.
+2. Set a network name and password and hit the power toggle. Windows brings up the hotspot and
+   shares the uplink's connection with it.
+3. Connect the Android device to that network. It appears in the client list once it has a lease.
+4. Pick a preset, or add a rule and switch on the impairments you want.
+5. Toggle things while traffic flows. Edits take effect on the next packet.
+
+**Bypass** passes everything through untouched without dropping the device off the network, which
+is the quickest way to compare impaired against clean behaviour.
+
+---
+
+## Rules
 
 Every rule matches on six independent dimensions, any of which can be left as "any":
 
@@ -28,21 +59,18 @@ Every rule matches on six independent dimensions, any of which can be left as "a
 | Remote port | `443`, `53, 80, 8000-8100`, `!443` |
 
 Addresses and ports are named for **the device** and **the remote peer**, not source and
-destination. One rule therefore reads the same in both directions: "device `.42`, remote port 443"
-means that device's HTTPS traffic, whichever way it happens to be flowing.
+destination, so one rule reads the same in both directions: "device `.42`, remote port 443" means
+that device's HTTPS traffic, whichever way it is flowing.
 
-Rules resolve **first match wins**, like a firewall list. That gives exceptions for free — a rule
-with no impairments enabled claims its traffic and passes it through untouched, so putting one
-above a broad rule carves a hole in it:
+Rules resolve **first match wins**, like a firewall. A rule with no impairments enabled claims its
+traffic and passes it through untouched, so placing one above a broad rule carves out an exception:
 
 ```
 1  DNS            remote :53      (nothing enabled)   ← stays clean
 2  Everything     any             block               ← everything else disappears
 ```
 
-## What you can do to it
-
-Nine impairments, each with its own switch:
+## Impairments
 
 | | Impairment | Parameters | What it models |
 |---|---|---|---|
@@ -56,77 +84,59 @@ Nine impairments, each with its own switch:
 | ☣ | **Tamper** | chance %, max bytes, fix checksum | Corruption. Leave the checksum wrong and the peer drops it itself. |
 | ⚡ | **Reset** | chance % | TCP connections refused mid-flight. |
 
-Presets are included as starting points: 2G/EDGE, 3G, weak LTE, lossy Wi-Fi, bufferbloat,
-satellite, dead air, no DNS, TLS refused, corruption.
+Built-in presets: 2G/EDGE, 3G, weak LTE, lossy Wi-Fi, bufferbloat, satellite, dead air, no DNS,
+TLS refused, corruption.
+
+## Troubleshooting
+
+| Symptom | Cause |
+|---|---|
+| "needs to run as administrator" | The driver and sharing APIs both require elevation. |
+| "capture driver missing" | `WinDivert.dll` or `WinDivert64.sys` is not next to `Crapnet.exe`. Re-extract the zip and check anti-virus has not quarantined the driver. |
+| Hotspot will not start | The adapter or its driver does not support Mobile Hotspot. Check Settings → Mobile hotspot. |
+| Device connects but has no internet | The uplink has no route, or another connection share is already configured. |
+| Rules have no effect | Check the master toggle is armed and Bypass is off, and that the device's address is inside the subnet shown. |
 
 ---
 
-## Requirements
+## Building from source
 
-- Windows 10 2004 or later (Windows 11 fine), 64-bit
-- A Wi-Fi adapter that supports Mobile Hotspot, **and** a wired connection for the internet
-- [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
-- Administrator rights — required both to load the capture driver and to share a connection
-
-## Setup
+Requires the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
 
 ```powershell
 git clone https://github.com/vlegeron/crapnet
 cd crapnet
 dotnet build -c Release
+```
 
-# WinDivert is vendored in third_party/windivert and copied next to the exe by the build.
-# Run elevated
+WinDivert is vendored in [`third_party/windivert`](third_party/windivert) and copied next to the
+executable by the build, so the output folder is ready to run (elevated):
+
+```powershell
 ./src/Crapnet.App/bin/Release/net8.0-windows10.0.19041.0/Crapnet.exe
 ```
 
-Or skip the build: every tagged version is published on
-[GitHub Releases](https://github.com/vlegeron/crapnet/releases) as `crapnet-<version>-win-x64.zip`,
-WinDivert included. Extract it and run `Crapnet.exe` as administrator.
-
-### Cutting a release
-
-Push a version tag and the `release` workflow tests, builds, packages and publishes it:
+The core logic is platform-neutral and its tests run on any OS:
 
 ```bash
-git tag v0.2.0
-git push origin v0.2.0
+dotnet test tests/Crapnet.Domain.Tests
+dotnet test tests/Crapnet.Application.Tests
 ```
-
-The tag sets the assembly version, so there is nothing else to bump. Tags with a suffix
-(`v0.2.0-rc.1`) are published as pre-releases.
-
-## Using it
-
-1. Plug in Ethernet and pick it as the **uplink**.
-2. Set a network name and password, hit the power toggle. Windows brings up the hotspot and
-   shares the uplink's connection with it.
-3. Connect the Android device to that network. It appears in the client list once it has a lease.
-4. Pick a preset, or add a rule and switch on the impairments you want.
-5. Toggle things while traffic flows. Edits reach the engine on the next packet.
-
-**Bypass** passes everything through untouched without detaching from the network, which is the
-quickest way to compare impaired against clean behaviour.
-
----
 
 ## How it works
 
 Windows Mobile Hotspot is built around sharing one specific connection profile, so handing it the
-Ethernet profile is what gives the phone its internet — no separate Internet Connection Sharing
-step is needed on that path. (ICS is implemented as a fallback for machines where Mobile Hotspot
-is unavailable.)
+Ethernet profile is what gives the device its internet; no separate Internet Connection Sharing
+step is needed. (ICS is implemented as a fallback where Mobile Hotspot is unavailable.)
 
-Traffic for a tethered client is *routed* by Windows rather than addressed to it, so Crapnet
-captures at the forwarding layer, where that traffic actually lives, and scopes the capture to the
-hotspot's own subnet so the rest of the machine is left alone.
+Traffic for a tethered client is *routed* by Windows rather than addressed to the machine, so
+Crapnet captures at WinDivert's forwarding layer, scoped to the hotspot's subnet so the rest of the
+machine is left alone. Packets are classified **uplink** or **downlink** by testing them against
+that subnet rather than trusting the driver's inbound/outbound flag, which stops meaning anything
+useful once Windows is routing on someone else's behalf.
 
-Packets are classified **uplink** or **downlink** by testing them against that subnet, not by the
-driver's raw inbound/outbound flag — once Windows is routing on someone else's behalf, "outbound"
-stops meaning anything useful.
-
-Every captured packet is withheld from the network until the engine decides what to do with it,
-which is why dropping a packet is simply a matter of not forwarding it.
+Every captured packet is held until the engine decides what to do with it, so dropping a packet is
+simply a matter of not forwarding it.
 
 ### Layering
 
@@ -137,57 +147,31 @@ Crapnet.Application      use cases, ports, impairment engine  net8.0
 Crapnet.Domain           rules, impairments, value objects    net8.0
 ```
 
-Dependencies point inwards only. The two inner layers target plain `net8.0` and know nothing about
-Windows, the capture driver or the UI: everything platform-specific sits behind a port
-(`IPacketGateway`, `IHotspotController`, `IClock`, `IRandomSource`, …) and is injected.
-
-That is not decoration. It means the part most worth getting right — how nine impairments compose,
-in what order, and with what timing — is exercised by **182 tests that run anywhere**, with no
-driver, no radio and no Windows:
-
-```bash
-dotnet test tests/Crapnet.Domain.Tests tests/Crapnet.Application.Tests
-```
-
-Probability and time are both injected, so "30% drop" is an exact assertion rather than a flaky
-one, and a 500 ms delay is verified without waiting 500 ms.
+Dependencies point inwards only. The two inner layers know nothing about Windows, the capture
+driver or the UI: everything platform-specific sits behind a port (`IPacketGateway`,
+`IHotspotController`, `IClock`, `IRandomSource`, …) and is injected. Probability and time are both
+injected too, so "30% drop" is an exact assertion rather than a flaky one, and a 500 ms delay is
+verified without waiting 500 ms.
 
 ### Design notes
 
 **Bandwidth is not a token bucket.** It models a link that serialises packets behind a virtual
-finish time. Queueing delay then emerges from offered load on its own, and packets cannot overtake
-one another — a token bucket will happily reorder a TCP stream while rate-limiting it, which
-quietly contaminates the thing you were trying to measure.
+finish time. Queueing delay emerges from offered load on its own, and packets cannot overtake one
+another; a token bucket will happily reorder a TCP stream while rate-limiting it, which quietly
+contaminates the thing you were trying to measure.
 
-**Destructive impairments run before expensive ones.** Block and drop are evaluated before
-anything that costs queue budget, so nothing is held for a packet that was going to be discarded.
-The delaying impairments then compose by accumulating onto a single release time.
+**Destructive impairments run first.** Block and drop are evaluated before anything that costs
+queue budget, so nothing is held for a packet that was going to be discarded. The delaying
+impairments then compose by accumulating onto a single release time.
 
 **Rule edits cross threads through one volatile handover.** The capture loop owns all per-rule
 state and runs single-threaded, so the hot path needs no locks, and toggling an impairment takes
-effect on the next packet without interrupting the capture.
+effect on the next packet without interrupting capture.
 
 **Per-rule state is per direction.** A 1 Mbps cap means 1 Mbps each way, because that is how
 people read it and how real links behave.
 
 ---
-
-## Status
-
-The solution builds clean and the domain and application layers are covered by the test suite
-above. The Windows-specific layers — the capture driver interop, Mobile Hotspot and ICS — compile
-but have **not yet been exercised against real hardware**, so treat the first run on a real machine
-as the shakedown.
-
-## Troubleshooting
-
-| Symptom | Cause |
-|---|---|
-| "needs to run as administrator" | The driver and sharing APIs both require elevation. |
-| "capture driver missing" | `WinDivert.dll` or `WinDivert64.sys` is not next to `Crapnet.exe`. Rebuild or re-extract, and check anti-virus has not quarantined the driver. |
-| Hotspot will not start | The adapter or driver does not support Mobile Hotspot. Check Settings → Mobile hotspot. |
-| Device connects but has no internet | The uplink has no route, or another share is already configured. |
-| Rules have no effect | Check the master toggle is armed and Bypass is off; confirm the device's address is inside the subnet shown. |
 
 ## Credits
 
@@ -197,5 +181,5 @@ are the reference points this is built against.
 
 ## Licence
 
-MIT. WinDivert is redistributed unmodified in [`third_party/windivert`](third_party/windivert)
-under LGPLv3; its licence ships alongside it in the repository and in every release.
+Crapnet is MIT licensed. WinDivert is redistributed unmodified under LGPLv3; its licence is in
+[`third_party/windivert/LICENSE`](third_party/windivert/LICENSE) and ships in every release.
