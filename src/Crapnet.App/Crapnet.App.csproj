@@ -26,4 +26,17 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets/**" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Vendored WinDivert runtime: the loader expects both files next to Crapnet.exe. -->
+    <None Include="../../third_party/windivert/x64/WinDivert.dll;../../third_party/windivert/x64/WinDivert64.sys"
+          Link="%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          Visible="false" />
+    <None Include="../../third_party/windivert/LICENSE"
+          Link="WinDivert-LICENSE.txt"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          Visible="false" />
+  </ItemGroup>
 </Project>

@@ -1,0 +1,104 @@
+name: release
+
+# Push a tag like v0.2.0 to publish a GitHub release. A tag with a suffix (v0.2.0-rc.1) becomes a
+# pre-release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)publish, e.g. v0.2.0'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      # One project per invocation: the .NET CLI rejects several at once with MSB1008.
+      - name: Test domain
+        run: dotnet test tests/Crapnet.Domain.Tests --configuration Release
+      - name: Test application
+        run: dotnet test tests/Crapnet.Application.Tests --configuration Release
+
+  release:
+    name: build and publish (windows)
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          $tag = $env:TAG
+          if ($tag -notmatch '^v(\d+\.\d+\.\d+)(-[0-9A-Za-z.-]+)?$') {
+            throw "Tag '$tag' is not a version tag like v1.2.3 or v1.2.3-rc.1."
+          }
+          $version = $tag.Substring(1)
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "prerelease=$(if ($Matches[2]) { 'true' } else { 'false' })" >> $env:GITHUB_OUTPUT
+
+      - name: Publish
+        run: >
+          dotnet publish src/Crapnet.App
+          --configuration Release
+          --runtime win-x64
+          --self-contained false
+          --output publish
+          -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Package
+        id: package
+        shell: pwsh
+        run: |
+          foreach ($f in 'WinDivert.dll', 'WinDivert64.sys') {
+            if (-not (Test-Path "publish/$f")) { throw "$f is missing from the publish output." }
+          }
+          Copy-Item LICENSE publish/LICENSE.txt
+          Copy-Item README.md publish/README.md
+          $zip = "crapnet-${{ steps.version.outputs.version }}-win-x64.zip"
+          Compress-Archive -Path publish/* -DestinationPath $zip
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  $zip" | Out-File -Encoding ascii "$zip.sha256"
+          "zip=$zip" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: Crapnet ${{ steps.version.outputs.version }}
+          prerelease: ${{ steps.version.outputs.prerelease }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            ${{ steps.package.outputs.zip }}
+            ${{ steps.package.outputs.zip }}.sha256
+          body: |
+            Extract the zip and run `Crapnet.exe` **as administrator**.
+
+            Requires Windows 10 2004+ (x64) and the [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
+            WinDivert 2.2.2 is bundled (LGPLv3, licence in `WinDivert-LICENSE.txt`).

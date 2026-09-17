@@ -37,9 +37,12 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       - name: Publish
         run: dotnet publish src/Crapnet.App --configuration Release --runtime win-x64 --self-contained false --output publish
-      - name: Fetch WinDivert
+      - name: Check WinDivert was published
         shell: pwsh
-        run: ./scripts/fetch-windivert.ps1 -Destination publish
+        run: |
+          foreach ($f in 'WinDivert.dll', 'WinDivert64.sys') {
+            if (-not (Test-Path "publish/$f")) { throw "$f is missing from the publish output." }
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: crapnet-win-x64

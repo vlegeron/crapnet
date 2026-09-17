@@ -8,10 +8,11 @@ namespace Crapnet.Infrastructure.Capture;
 /// </summary>
 /// <remarks>
 /// <para>
-/// WinDivert is not redistributed with Crapnet: the driver is a separately signed binary that has
-/// to be fetched, so a fresh clone will always be missing it. Catching that here turns what would
+/// WinDivert is vendored under <c>third_party/windivert</c> and copied next to the executable by
+/// the build, so the files should always be there. They can still go missing — a partial copy of
+/// the output folder, or anti-virus quarantining the driver. Catching that here turns what would
 /// otherwise be a <c>DllNotFoundException</c> deep inside the first capture attempt into a message
-/// that names the script which fixes it.
+/// that says what to do.
 /// </para>
 /// <para>
 /// This only answers "are the files present". Whether the driver will actually load — signature
@@ -26,9 +27,6 @@ public sealed class WinDivertDriverProbe : ICaptureDriverProbe
 
     /// <summary>The kernel driver the library installs on first open. Crapnet is 64-bit only.</summary>
     public const string DriverFileName = "WinDivert64.sys";
-
-    /// <summary>The script that downloads both files into the output directory.</summary>
-    public const string FetchScriptPath = "scripts/fetch-windivert.ps1";
 
     private readonly string _directory;
 
@@ -55,6 +53,6 @@ public sealed class WinDivertDriverProbe : ICaptureDriverProbe
 
         return $"Packet capture is unavailable: {string.Join(" and ", missing)} " +
                $"{(missing.Count == 1 ? "is" : "are")} missing from '{_directory}'. " +
-               $"Run {FetchScriptPath} to download WinDivert into the output directory.";
+               "Rebuild Crapnet or re-extract the release archive, and check that anti-virus has not quarantined them.";
     }
 }

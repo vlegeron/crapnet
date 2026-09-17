@@ -325,7 +325,7 @@ public static unsafe class WinDivertNative
     public static string DescribeOpenError(int errorCode) => errorCode switch
     {
         ErrorCodes.FileNotFound =>
-            "WinDivert64.sys was not found next to WinDivert.dll. Run scripts/fetch-windivert.ps1 to fetch the driver.",
+            "WinDivert64.sys was not found next to WinDivert.dll. Rebuild Crapnet or re-extract the release archive.",
         ErrorCodes.AccessDenied =>
             "Loading the WinDivert driver requires administrator rights. Restart Crapnet elevated.",
         ErrorCodes.InvalidParameter =>
@@ -335,7 +335,7 @@ public static unsafe class WinDivertNative
         ErrorCodes.DriverBlocked =>
             "The WinDivert driver was blocked from loading, usually by anti-virus or an endpoint protection policy. Allow WinDivert64.sys and try again.",
         ErrorCodes.ServiceDoesNotExist =>
-            "The WinDivert driver service is missing and could not be created. Run scripts/fetch-windivert.ps1 from an elevated prompt.",
+            "The WinDivert driver service is missing and could not be created. Check WinDivert64.sys sits next to Crapnet.exe and restart Crapnet elevated.",
         _ => new Win32Exception(errorCode).Message,
     };
 }

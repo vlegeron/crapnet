@@ -75,14 +75,26 @@ git clone https://github.com/vlegeron/crapnet
 cd crapnet
 dotnet build -c Release
 
-# Fetch the capture driver (not vendored: it is a signed kernel driver under LGPLv3)
-./scripts/fetch-windivert.ps1 -Destination src/Crapnet.App/bin/Release/net8.0-windows10.0.19041.0
-
+# WinDivert is vendored in third_party/windivert and copied next to the exe by the build.
 # Run elevated
 ./src/Crapnet.App/bin/Release/net8.0-windows10.0.19041.0/Crapnet.exe
 ```
 
-Prebuilt binaries are produced by CI on every push; grab the `crapnet-win-x64` artifact.
+Or skip the build: every tagged version is published on
+[GitHub Releases](https://github.com/vlegeron/crapnet/releases) as `crapnet-<version>-win-x64.zip`,
+WinDivert included. Extract it and run `Crapnet.exe` as administrator.
+
+### Cutting a release
+
+Push a version tag and the `release` workflow tests, builds, packages and publishes it:
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The tag sets the assembly version, so there is nothing else to bump. Tags with a suffix
+(`v0.2.0-rc.1`) are published as pre-releases.
 
 ## Using it
 
@@ -172,7 +184,7 @@ as the shakedown.
 | Symptom | Cause |
 |---|---|
 | "needs to run as administrator" | The driver and sharing APIs both require elevation. |
-| "capture driver missing" | Run `scripts/fetch-windivert.ps1`. |
+| "capture driver missing" | `WinDivert.dll` or `WinDivert64.sys` is not next to `Crapnet.exe`. Rebuild or re-extract, and check anti-virus has not quarantined the driver. |
 | Hotspot will not start | The adapter or driver does not support Mobile Hotspot. Check Settings → Mobile hotspot. |
 | Device connects but has no internet | The uplink has no route, or another share is already configured. |
 | Rules have no effect | Check the master toggle is armed and Bypass is off; confirm the device's address is inside the subnet shown. |
@@ -185,4 +197,5 @@ are the reference points this is built against.
 
 ## Licence
 
-MIT. WinDivert is LGPLv3 and is fetched separately rather than redistributed here.
+MIT. WinDivert is redistributed unmodified in [`third_party/windivert`](third_party/windivert)
+under LGPLv3; its licence ships alongside it in the repository and in every release.

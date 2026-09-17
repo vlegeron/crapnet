@@ -7,11 +7,11 @@ artifacts/
 .vs/
 .idea/
 
-# Native WinDivert runtime (fetched by scripts/fetch-windivert.ps1, not vendored)
-runtime/windivert/
+# Native binaries, except the vendored WinDivert runtime
 *.sys
 *.dll
 !**/refs/*.dll
+!third_party/windivert/x64/*
 
 # Local settings
 *.local.json
